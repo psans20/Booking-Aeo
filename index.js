@@ -134,32 +134,17 @@ async function visitAndScrape(url) {
         // Log post currency change URL visit
         console.log(`Visited URL after currency change: ${url}`);
 
-        const data = await page.evaluate(() => {
-            return new Promise((resolve) => {
-                setTimeout(() => {
-                    const imageElement = document.querySelectorAll('.active-image img')[0];
-                    const priceElement = (() => {
-                        const divs = document.querySelectorAll('div');
-                        for (let div of divs) {
-                            if (div.innerText.startsWith('US$')) {
-                                return div.innerText;
-                            }
-                        }
-                        return null;
-                    })();
-                    
-                    const titleElement = document.querySelector('.pp-header__title');
-                    const roomSizeElement = document.querySelector('[data-name-en="room size"] .bui-badge');
+     
 
-                    const image = imageElement ? imageElement.src : null;
-                    const price = priceElement ? priceElement.innerText : null;
-                    const title = titleElement ? titleElement.innerText.trim() : null;
-                    const roomSize = roomSizeElement ? roomSizeElement.innerText : null;
+        const hotelName = await page.evaluate(() => window.booking.env.b_hotel_name);
+        const Image = await page.evaluate(() => window.booking.env.allRoomPhotos[0].large_url);
+        const Price = await page.evaluate(() => window.booking.env.b_rooms_available_and_soldout[0].b_blocks[0].b_price);
+        const roomSize = await page.evaluate(() => document.querySelector(`[data-name-en="room size"]`).innerText);
 
-                    resolve({ image, price, title, roomSize, imageFound: !!image, priceFound: !!price, titleFound: !!title, roomSizeFound: !!roomSize });
-                }, 1000);
-            });
-        });
+        console.log(`Hotel Name: ${hotelName}`);
+        console.log(`Image: ${'https://cf.bstatic.com' + Image}`)
+        console.log(`Price: ${Price}`);
+        console.log(`Room Size: ${roomSize}`);
 
         await browser.close();
 
